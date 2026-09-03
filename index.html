@@ -265,7 +265,7 @@
     <div class="card">
       <h2>Penerimaan dari Supplier</h2>
       <div class="form-row">
-        <div><label>Nama Supplier</label><input id="pen-supplier" placeholder="Nama supplier"></div>
+        <div><label>Nama Supplier</label><select id="pen-supplier"></select></div>
       </div>
       <div id="pen-rows"></div>
       <button class="btn btn-sm" onclick="addRow('pen')">+ Tambah baris</button>
@@ -304,7 +304,7 @@
     <div class="card">
       <h2>Pengembalian Kosong ke Supplier</h2>
       <div class="form-row">
-        <div><label>Nama Supplier Tujuan</label><input id="ks-supplier" placeholder="Nama supplier" list="supplierList"><datalist id="supplierList"></datalist></div>
+        <div><label>Nama Supplier Tujuan</label><select id="ks-supplier"></select></div>
       </div>
       <div id="ks-rows"></div>
       <button class="btn btn-sm" onclick="addRow('ks')">+ Tambah baris</button>
@@ -445,8 +445,14 @@ async function loadMasterData() {
   populateSelect('kp-plant', MASTER.plants.map(p => ({ value: p.KodePlant, label: `${p.KodePlant} — ${p.NamaPlant}` })));
   populateSelect('kbp-plant', MASTER.plants.map(p => ({ value: p.KodePlant, label: `${p.KodePlant} — ${p.NamaPlant}` })));
   populateSelect('currentUser', MASTER.users.map(u => ({ value: u, label: u })));
-  const dl = document.getElementById('supplierList');
-  dl.innerHTML = MASTER.suppliers.map(s => `<option value="${s}">`).join('');
+  if (MASTER.suppliers.length === 0) {
+    const emptyOpt = [{ value: '', label: '⚠ Belum ada data — isi sheet MasterSupplier dulu' }];
+    populateSelect('pen-supplier', emptyOpt);
+    populateSelect('ks-supplier', emptyOpt);
+  } else {
+    populateSelect('pen-supplier', MASTER.suppliers.map(s => ({ value: s, label: s })));
+    populateSelect('ks-supplier', MASTER.suppliers.map(s => ({ value: s, label: s })));
+  }
   ['pen', 'kp', 'kbp', 'ks', 'da'].forEach(prefix => { rowCounters[prefix] = 0; addRow(prefix); });
 }
 
