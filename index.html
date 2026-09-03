@@ -202,6 +202,8 @@
   .btn-sm{padding:6px 11px;font-size:12.5px;}
   .btn-danger-text{background:none;border:none;color:var(--risk);cursor:pointer;font-size:15px;padding:2px 6px;}
   .btn-full-right{text-align:right;margin-top:14px;}
+  .qty-display{font-size:13px;color:var(--ink-muted);}
+  .qty-display strong{color:var(--steel);font-family:var(--font-display);font-size:17px;font-weight:600;}
 
   .info-box{
     background:var(--steel-tint);color:var(--steel-dark);padding:10px 14px;
@@ -266,9 +268,13 @@
       <h2>Penerimaan dari Supplier</h2>
       <div class="form-row">
         <div><label>Nama Supplier</label><select id="pen-supplier"></select></div>
+        <div><label>No PO</label><input id="pen-nopo" placeholder="Contoh: A130536"></div>
       </div>
       <div id="pen-rows"></div>
-      <button class="btn btn-sm" onclick="addRow('pen')">+ Tambah baris</button>
+      <div class="card-toolbar" style="margin-top:8px">
+        <button class="btn btn-sm" onclick="addRow('pen')">+ Tambah baris</button>
+        <span class="qty-display">Total tabung: <strong id="pen-qty">0</strong></span>
+      </div>
       <div class="btn-full-right"><button class="btn btn-primary" onclick="submitTransaction('pen', 'Penerimaan dari Supplier')">Simpan Transaksi</button></div>
     </div>
   </div>
@@ -280,8 +286,14 @@
         <div><label>Nama PIC Penerima</label><input id="kp-pic" placeholder="Nama penerima di plant"></div>
         <div><label>Lokasi Plant</label><select id="kp-plant"></select></div>
       </div>
+      <div class="form-row">
+        <div><label>No MIS</label><input id="kp-nomis" placeholder="Contoh: A120364"></div>
+      </div>
       <div id="kp-rows"></div>
-      <button class="btn btn-sm" onclick="addRow('kp')">+ Tambah baris</button>
+      <div class="card-toolbar" style="margin-top:8px">
+        <button class="btn btn-sm" onclick="addRow('kp')">+ Tambah baris</button>
+        <span class="qty-display">Total tabung: <strong id="kp-qty">0</strong></span>
+      </div>
       <div class="btn-full-right"><button class="btn btn-primary" onclick="submitTransaction('kp', 'Pengiriman ke Plant')">Simpan Transaksi</button></div>
     </div>
   </div>
@@ -293,9 +305,15 @@
         <div><label>Dari Lokasi Plant</label><select id="kbp-plant" onchange="showPlantInfo()"></select></div>
         <div><label>Nama Pengirim (opsional)</label><input id="kbp-pic" placeholder="Nama dari plant"></div>
       </div>
+      <div class="form-row">
+        <div><label>No MIS</label><input id="kbp-nomis" placeholder="Contoh: A120364"></div>
+      </div>
       <div id="kbp-info" class="info-box" style="display:none"></div>
       <div id="kbp-rows"></div>
-      <button class="btn btn-sm" onclick="addRow('kbp')">+ Tambah baris</button>
+      <div class="card-toolbar" style="margin-top:8px">
+        <button class="btn btn-sm" onclick="addRow('kbp')">+ Tambah baris</button>
+        <span class="qty-display">Total tabung: <strong id="kbp-qty">0</strong></span>
+      </div>
       <div class="btn-full-right"><button class="btn btn-primary" onclick="submitTransaction('kbp', 'Pengembalian dari Plant')">Simpan Transaksi</button></div>
     </div>
   </div>
@@ -305,9 +323,13 @@
       <h2>Pengembalian Kosong ke Supplier</h2>
       <div class="form-row">
         <div><label>Nama Supplier Tujuan</label><select id="ks-supplier"></select></div>
+        <div><label>No Pengambilan Barang</label><input id="ks-nopengambilan" placeholder="Contoh: NB2012431067"></div>
       </div>
       <div id="ks-rows"></div>
-      <button class="btn btn-sm" onclick="addRow('ks')">+ Tambah baris</button>
+      <div class="card-toolbar" style="margin-top:8px">
+        <button class="btn btn-sm" onclick="addRow('ks')">+ Tambah baris</button>
+        <span class="qty-display">Total tabung: <strong id="ks-qty">0</strong></span>
+      </div>
       <div class="btn-full-right"><button class="btn btn-primary" onclick="submitTransaction('ks', 'Pengembalian Kosong ke Supplier')">Simpan Transaksi</button></div>
     </div>
   </div>
@@ -328,7 +350,10 @@
       <h2>Input Data Awal (Stock Opname)</h2>
       <p class="helper-text">Gunakan halaman ini sekali di awal untuk memasukkan kondisi tabung yang sudah ada saat ini, sebelum sistem dipakai untuk transaksi harian.</p>
       <div id="da-rows"></div>
-      <button class="btn btn-sm" onclick="addRow('da')">+ Tambah baris</button>
+      <div class="card-toolbar" style="margin-top:8px">
+        <button class="btn btn-sm" onclick="addRow('da')">+ Tambah baris</button>
+        <span class="qty-display">Total tabung: <strong id="da-qty">0</strong></span>
+      </div>
       <div class="btn-full-right"><button class="btn btn-primary" onclick="submitInitialStock()">Simpan Data Awal</button></div>
     </div>
   </div>
@@ -340,7 +365,7 @@
 // ============================================================
 // KONFIGURASI — GANTI dengan URL Web App Apps Script Anda setelah deploy
 // ============================================================
-const API_URL = 'https://script.google.com/macros/s/AKfycbxZ_mVTQogC3goNTQTcsWL9KBgLxvJxDBdiDrBefpSfYyfanA-T9yRPQYVL9qOBv0Gv/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwjL4AU-zfCCMlXIuoy_ZUE-z0Z8CukGQaPV0o0h7k7LBmB2PGBnQgC8W9TfoH2KDEO/exec';
 
 // Ambang batas "usia" tabung di plant/supplier (hari) untuk pewarnaan status
 const WATCH_DAYS = 7;   // >= ini: kuning (perlu dicek)
@@ -492,11 +517,29 @@ function addRow(prefix) {
     <td style="color:var(--ink-faint)">${rowNum}</td>
     <td><select class="row-gas">${gasOptions()}</select></td>
     <td><input class="row-nomor mono" placeholder="Nomor tabung"></td>
-    <td><select class="row-kondisi"><option value="Isi">Isi</option><option value="Kosong">Kosong</option></select></td>
+    <td><select class="row-kondisi" onchange="updateQty('${prefix}')"><option value="Isi">Isi</option><option value="Kosong">Kosong</option></select></td>
     ${locationCell}
-    <td><button class="btn-danger-text" onclick="this.closest('tr').remove()">✕</button></td>
+    <td><button class="btn-danger-text" onclick="removeRow('${prefix}', this)">✕</button></td>
   `;
   tbody.appendChild(tr);
+  updateQty(prefix);
+}
+
+function removeRow(prefix, btn) {
+  btn.closest('tr').remove();
+  updateQty(prefix);
+}
+
+function updateQty(prefix) {
+  const el = document.getElementById(`${prefix}-qty`);
+  if (!el) return;
+  const rows = document.querySelectorAll(`#${prefix}-rows tbody tr`);
+  let isi = 0, kosong = 0;
+  rows.forEach(tr => {
+    const kondisiSel = tr.querySelector('.row-kondisi');
+    if (kondisiSel && kondisiSel.value === 'Isi') isi++; else if (kondisiSel) kosong++;
+  });
+  el.textContent = `${rows.length} (Isi: ${isi}, Kosong: ${kosong})`;
 }
 
 function toggleDaDetail(sel) {
@@ -531,16 +574,20 @@ async function submitTransaction(prefix, type) {
   if (rows.length === 0) { toast('Isi minimal 1 baris tabung', true); return; }
   const user = document.getElementById('currentUser').value;
   const body = { action: 'addTransaction', type, user, rows };
-  if (prefix === 'pen') body.namaSupplier = document.getElementById('pen-supplier').value.trim();
-  if (prefix === 'kp') { body.namaPIC = document.getElementById('kp-pic').value.trim(); body.kodePlant = document.getElementById('kp-plant').value; }
-  if (prefix === 'kbp') { body.namaPIC = document.getElementById('kbp-pic').value.trim(); body.kodePlant = document.getElementById('kbp-plant').value; }
-  if (prefix === 'ks') body.namaSupplier = document.getElementById('ks-supplier').value.trim();
+  if (prefix === 'pen') { body.namaSupplier = document.getElementById('pen-supplier').value; body.noPO = document.getElementById('pen-nopo').value.trim(); }
+  if (prefix === 'kp') { body.namaPIC = document.getElementById('kp-pic').value.trim(); body.kodePlant = document.getElementById('kp-plant').value; body.noMIS = document.getElementById('kp-nomis').value.trim(); }
+  if (prefix === 'kbp') { body.namaPIC = document.getElementById('kbp-pic').value.trim(); body.kodePlant = document.getElementById('kbp-plant').value; body.noMIS = document.getElementById('kbp-nomis').value.trim(); }
+  if (prefix === 'ks') { body.namaSupplier = document.getElementById('ks-supplier').value; body.noPengambilanSupplier = document.getElementById('ks-nopengambilan').value.trim(); }
 
   const result = await apiPost(body);
   if (result.error) { toast('Gagal: ' + result.error, true); return; }
   toast(`Tersimpan — ${result.count} tabung`);
   if (result.warnings && result.warnings.length) toast('Perhatian: ' + result.warnings.join(' | '), true);
   resetRows(prefix);
+  if (prefix === 'pen') document.getElementById('pen-nopo').value = '';
+  if (prefix === 'kp') { document.getElementById('kp-pic').value = ''; document.getElementById('kp-nomis').value = ''; }
+  if (prefix === 'kbp') { document.getElementById('kbp-pic').value = ''; document.getElementById('kbp-nomis').value = ''; }
+  if (prefix === 'ks') document.getElementById('ks-nopengambilan').value = '';
   refreshFlags();
 }
 
@@ -681,10 +728,11 @@ async function searchHistory() {
   const list = await apiGet('getHistory', { nomorTabung: nomor });
   if (list.error) { el.innerHTML = 'Gagal: ' + list.error; return; }
   if (list.length === 0) { el.innerHTML = '<div class="empty-msg">Tidak ada riwayat untuk nomor tabung ini.</div>'; return; }
-  let html = `<table><tr><th>Waktu</th><th>Jenis Transaksi</th><th>Kondisi</th><th>Detail</th><th>User</th></tr>`;
+  let html = `<table><tr><th>Waktu</th><th>Jenis Transaksi</th><th>Kondisi</th><th>Detail</th><th>No Referensi</th><th>User</th></tr>`;
   list.forEach(t => {
     const detail = t.NamaSupplier || t.KodePlant || '-';
-    html += `<tr><td>${new Date(t.Timestamp).toLocaleString('id-ID')}</td><td>${t.JenisTransaksi}</td><td>${t.Kondisi}</td><td>${detail}</td><td>${t.DiinputOleh}</td></tr>`;
+    const noRef = t.NoPO || t.NoMIS || t.NoPengambilanSupplier || '-';
+    html += `<tr><td>${new Date(t.Timestamp).toLocaleString('id-ID')}</td><td>${t.JenisTransaksi}</td><td>${t.Kondisi}</td><td>${detail}</td><td class="mono">${noRef}</td><td>${t.DiinputOleh}</td></tr>`;
   });
   html += `</table>`;
   el.innerHTML = html;
