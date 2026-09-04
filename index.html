@@ -216,6 +216,7 @@
     position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
     background:var(--ink);color:#fff;padding:11px 20px;border-radius:9px;
     font-size:13.5px;display:none;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,.2);
+    max-width:min(600px,90vw);word-break:break-word;line-height:1.5;
   }
   .toast.warn{background:var(--watch);}
 
@@ -365,7 +366,7 @@
 // ============================================================
 // KONFIGURASI — GANTI dengan URL Web App Apps Script Anda setelah deploy
 // ============================================================
-const API_URL = 'https://script.google.com/macros/s/AKfycbzGRz30RbeMR9KYfsW8fyujWmeeVntAAz6QGOBwHeZmDKvjXLzu2iYZ4l6ZajhGAulz/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyuYQe8lO8eMVSi7DOwAVLWJ7NZm26iT48DxP9au2BSvS42HAoPqFS1gQLiMAveyzyZ/exec';
 
 // Ambang batas "usia" tabung di plant/supplier (hari) untuk pewarnaan status
 const WATCH_DAYS = 7;   // >= ini: kuning (perlu dicek)
@@ -445,7 +446,7 @@ function toast(msg, isWarn) {
   t.textContent = msg;
   t.className = 'toast' + (isWarn ? ' warn' : '');
   t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 3800);
+  setTimeout(() => t.style.display = 'none', isWarn ? 6000 : 3800);
 }
 
 // ---------- API helpers ----------
@@ -580,9 +581,12 @@ async function submitTransaction(prefix, type) {
   if (prefix === 'ks') { body.namaSupplier = document.getElementById('ks-supplier').value; body.noPengambilanSupplier = document.getElementById('ks-nopengambilan').value.trim(); }
 
   const result = await apiPost(body);
-  if (result.error) { toast('Gagal: ' + result.error, true); return; }
+  if (result.error) {
+    const msg = (result.errors && result.errors.length) ? result.errors.join(' | ') : result.error;
+    toast('Ditolak — ' + msg, true);
+    return; // form TIDAK direset, biarkan user koreksi nomor yang salah
+  }
   toast(`Tersimpan — ${result.count} tabung`);
-  if (result.warnings && result.warnings.length) toast('Perhatian: ' + result.warnings.join(' | '), true);
   resetRows(prefix);
   if (prefix === 'pen') document.getElementById('pen-nopo').value = '';
   if (prefix === 'kp') { document.getElementById('kp-pic').value = ''; document.getElementById('kp-nomis').value = ''; }
