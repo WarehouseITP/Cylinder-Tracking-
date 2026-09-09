@@ -31,12 +31,18 @@
   }
   *{box-sizing:border-box;}
   html,body{margin:0;height:100%;}
+  html,body{overflow-x:hidden;}
   body{
     font-family:var(--font-body);
     background:var(--bg);
     color:var(--ink);
     display:flex;
     min-height:100vh;
+  }
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -2px;}
+  .table-scroll table{min-width:520px;}
+  @media (max-width:600px){
+    .table-scroll table{min-width:460px;}
   }
 
   /* ---------- Sidebar ---------- */
@@ -366,7 +372,7 @@
 // ============================================================
 // KONFIGURASI — GANTI dengan URL Web App Apps Script Anda setelah deploy
 // ============================================================
-const API_URL = 'https://script.google.com/macros/s/AKfycbyuYQe8lO8eMVSi7DOwAVLWJ7NZm26iT48DxP9au2BSvS42HAoPqFS1gQLiMAveyzyZ/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyrSX1U9QlRC0KNl1p8mBj2Y_rQ7gKRZIcZaeln8PjjJzkBXrdg-zsXbEMiL8AwGjGa/exec';
 
 // Ambang batas "usia" tabung di plant/supplier (hari) untuk pewarnaan status
 const WATCH_DAYS = 7;   // >= ini: kuning (perlu dicek)
@@ -494,11 +500,11 @@ function addRow(prefix) {
   rowCounters[prefix] = (rowCounters[prefix] || 0) + 1;
   const container = document.getElementById(`${prefix}-rows`);
   if (!container.querySelector('table')) {
-    container.innerHTML = `<table class="rows-table"><thead><tr>
+    container.innerHTML = `<div class="table-scroll"><table class="rows-table"><thead><tr>
       <th style="width:28px">#</th><th>Jenis Gas</th><th>Nomor Tabung</th>
       <th style="width:100px">Kondisi</th>` +
       (prefix === 'da' ? '<th style="width:160px">Lokasi</th>' : '') +
-      `<th style="width:28px"></th></tr></thead><tbody></tbody></table>`;
+      `<th style="width:28px"></th></tr></thead><tbody></tbody></table></div>`;
   }
   const tbody = container.querySelector('tbody');
   const tr = document.createElement('tr');
@@ -632,18 +638,18 @@ async function loadDashboard() {
     <div class="stat safe"><div class="label">Kumulatif ke Supplier</div><div class="value">${r.kumulatifKeSupplier}</div></div>
   </div>`;
 
-  html += `<div class="card"><h3>Stok per Jenis Gas</h3><table><tr><th>Jenis Gas</th><th>Isi</th><th>Kosong</th><th>Total</th></tr>`;
+  html += `<div class="card"><h3>Stok per Jenis Gas</h3><div class="table-scroll"><table><tr><th>Jenis Gas</th><th>Isi</th><th>Kosong</th><th>Total</th></tr>`;
   Object.keys(d.perJenisGas).forEach(gas => {
     const g = d.perJenisGas[gas];
     html += `<tr><td>${gas}</td><td>${g.isi}</td><td>${g.kosong}</td><td><strong>${g.isi + g.kosong}</strong></td></tr>`;
   });
-  html += `</table></div>`;
+  html += `</table></div></div>`;
 
-  html += `<div class="card"><h3>Transaksi Terbaru</h3><table><tr><th>Waktu</th><th>Jenis</th><th>Tabung</th><th>User</th></tr>`;
+  html += `<div class="card"><h3>Transaksi Terbaru</h3><div class="table-scroll"><table><tr><th>Waktu</th><th>Jenis Transaksi</th><th>Jenis Tabung</th><th>No. Tabung</th><th>User</th></tr>`;
   d.transaksiTerbaru.forEach(t => {
-    html += `<tr><td>${new Date(t.Timestamp).toLocaleString('id-ID')}</td><td>${t.JenisTransaksi}</td><td class="mono">${t.NomorTabung}</td><td>${t.DiinputOleh}</td></tr>`;
+    html += `<tr><td>${new Date(t.Timestamp).toLocaleString('id-ID')}</td><td>${t.JenisTransaksi}</td><td>${t.JenisGas}</td><td class="mono">${t.NomorTabung}</td><td>${t.DiinputOleh}</td></tr>`;
   });
-  html += `</table></div>`;
+  html += `</table></div></div>`;
   el.innerHTML = html;
 }
 
@@ -666,7 +672,7 @@ async function loadPlantMonitoring() {
   if (d.summary.length === 0) {
     html += `<div class="card"><div class="empty-msg">Belum ada tabung tercatat di plant manapun.</div></div>`;
   } else {
-    html += `<div class="card"><h3>Ringkasan per Lokasi Plant</h3><table><tr><th>Plant</th><th>Isi</th><th>Kosong</th><th>Total</th><th>Usia Tertua</th><th>Status</th></tr>`;
+    html += `<div class="card"><h3>Ringkasan per Lokasi Plant</h3><div class="table-scroll"><table><tr><th>Plant</th><th>Isi</th><th>Kosong</th><th>Total</th><th>Usia Tertua</th><th>Status</th></tr>`;
     d.summary.forEach(s => {
       const cls = agingClass(s.maxHari);
       html += `<tr class="row-flag ${cls}">
@@ -676,9 +682,9 @@ async function loadPlantMonitoring() {
         <td><span class="tag ${cls === 'risk' ? 'tag-risk' : cls === 'watch' ? 'tag-kosong' : 'tag-isi'}">${agingLabel(s.maxHari)}</span></td>
       </tr>`;
     });
-    html += `</table></div>`;
+    html += `</table></div></div>`;
 
-    html += `<div class="card"><h3>Detail Tiap Tabung (diurutkan dari paling lama)</h3><table><tr><th>Nomor Tabung</th><th>Jenis Gas</th><th>Kondisi</th><th>Lokasi Plant</th><th>Sejak</th><th>Usia</th></tr>`;
+    html += `<div class="card"><h3>Detail Tiap Tabung (diurutkan dari paling lama)</h3><div class="table-scroll"><table><tr><th>Nomor Tabung</th><th>Jenis Gas</th><th>Kondisi</th><th>Lokasi Plant</th><th>Sejak</th><th>Usia</th></tr>`;
     d.detail.forEach(x => {
       const cls = agingClass(x.sudahHari);
       html += `<tr class="row-flag ${cls}">
@@ -689,7 +695,7 @@ async function loadPlantMonitoring() {
         <td><span class="tag ${cls === 'risk' ? 'tag-risk' : cls === 'watch' ? 'tag-kosong' : 'tag-isi'}">${x.sudahHari} hari</span></td>
       </tr>`;
     });
-    html += `</table></div>`;
+    html += `</table></div></div>`;
   }
   el.innerHTML = html;
   document.getElementById('flag-monitorplant').classList.toggle('show', riskCount > 0);
@@ -703,13 +709,13 @@ async function loadAtSupplier() {
   if (list.error) { el.innerHTML = 'Gagal memuat: ' + list.error; return; }
   if (list.length === 0) { el.innerHTML = '<div class="card"><div class="empty-msg">Tidak ada tabung yang sedang di supplier.</div></div>'; return; }
   list.sort((a, b) => b.sudahHari - a.sudahHari);
-  let html = `<div class="card"><table><tr><th>Nomor Tabung</th><th>Jenis Gas</th><th>Supplier</th><th>Usia</th></tr>`;
+  let html = `<div class="card"><div class="table-scroll"><table><tr><th>Nomor Tabung</th><th>Jenis Gas</th><th>Supplier</th><th>Usia</th></tr>`;
   list.forEach(r => {
     const cls = agingClass(r.sudahHari);
     html += `<tr class="row-flag ${cls}"><td class="mono">${r.nomorTabung}</td><td>${r.jenisGas}</td><td>${r.supplier}</td>
       <td><span class="tag ${cls === 'risk' ? 'tag-risk' : cls === 'watch' ? 'tag-kosong' : 'tag-isi'}">${r.sudahHari} hari</span></td></tr>`;
   });
-  html += `</table></div>`;
+  html += `</table></div></div>`;
   el.innerHTML = html;
 }
 
@@ -732,13 +738,13 @@ async function searchHistory() {
   const list = await apiGet('getHistory', { nomorTabung: nomor });
   if (list.error) { el.innerHTML = 'Gagal: ' + list.error; return; }
   if (list.length === 0) { el.innerHTML = '<div class="empty-msg">Tidak ada riwayat untuk nomor tabung ini.</div>'; return; }
-  let html = `<table><tr><th>Waktu</th><th>Jenis Transaksi</th><th>Kondisi</th><th>Detail</th><th>No Referensi</th><th>User</th></tr>`;
+  let html = `<div class="table-scroll"><table><tr><th>Waktu</th><th>Jenis Transaksi</th><th>Jenis Gas</th><th>Kondisi</th><th>Detail</th><th>No Referensi</th><th>User</th></tr>`;
   list.forEach(t => {
     const detail = t.NamaSupplier || t.KodePlant || '-';
     const noRef = t.NoPO || t.NoMIS || t.NoPengambilanSupplier || '-';
-    html += `<tr><td>${new Date(t.Timestamp).toLocaleString('id-ID')}</td><td>${t.JenisTransaksi}</td><td>${t.Kondisi}</td><td>${detail}</td><td class="mono">${noRef}</td><td>${t.DiinputOleh}</td></tr>`;
+    html += `<tr><td>${new Date(t.Timestamp).toLocaleString('id-ID')}</td><td>${t.JenisTransaksi}</td><td>${t.JenisGas}</td><td>${t.Kondisi}</td><td>${detail}</td><td class="mono">${noRef}</td><td>${t.DiinputOleh}</td></tr>`;
   });
-  html += `</table>`;
+  html += `</table></div>`;
   el.innerHTML = html;
 }
 
