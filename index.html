@@ -205,6 +205,13 @@
   .btn:hover{background:var(--surface-alt);}
   .btn-primary{background:var(--steel);color:#fff;border-color:var(--steel);}
   .btn-primary:hover{background:var(--steel-dark);}
+  .btn[disabled]{opacity:.65;cursor:not-allowed;}
+  .spinner{
+    display:inline-block;width:13px;height:13px;border-radius:50%;
+    border:2px solid rgba(255,255,255,.4);border-top-color:#fff;
+    animation:spin .7s linear infinite;vertical-align:-2px;margin-right:7px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
   .btn-sm{padding:6px 11px;font-size:12.5px;}
   .btn-danger-text{background:none;border:none;color:var(--risk);cursor:pointer;font-size:15px;padding:2px 6px;}
   .btn-full-right{text-align:right;margin-top:14px;}
@@ -282,7 +289,7 @@
         <button class="btn btn-sm" onclick="addRow('pen')">+ Tambah baris</button>
         <span class="qty-display">Total tabung: <strong id="pen-qty">0</strong></span>
       </div>
-      <div class="btn-full-right"><button class="btn btn-primary" onclick="submitTransaction('pen', 'Penerimaan dari Supplier')">Simpan Transaksi</button></div>
+      <div class="btn-full-right"><button class="btn btn-primary" onclick="submitTransaction(this, 'pen', 'Penerimaan dari Supplier')">Simpan Transaksi</button></div>
     </div>
   </div>
 
@@ -295,13 +302,14 @@
       </div>
       <div class="form-row">
         <div><label>No MIS</label><input id="kp-nomis" placeholder="Contoh: A120364"></div>
+        <div><label>Detail Lokasi</label><input id="kp-detaillokasi" placeholder="Contoh: Area produksi lantai 2"></div>
       </div>
       <div id="kp-rows"></div>
       <div class="card-toolbar" style="margin-top:8px">
         <button class="btn btn-sm" onclick="addRow('kp')">+ Tambah baris</button>
         <span class="qty-display">Total tabung: <strong id="kp-qty">0</strong></span>
       </div>
-      <div class="btn-full-right"><button class="btn btn-primary" onclick="submitTransaction('kp', 'Pengiriman ke Plant')">Simpan Transaksi</button></div>
+      <div class="btn-full-right"><button class="btn btn-primary" onclick="submitTransaction(this, 'kp', 'Pengiriman ke Plant')">Simpan Transaksi</button></div>
     </div>
   </div>
 
@@ -321,7 +329,7 @@
         <button class="btn btn-sm" onclick="addRow('kbp')">+ Tambah baris</button>
         <span class="qty-display">Total tabung: <strong id="kbp-qty">0</strong></span>
       </div>
-      <div class="btn-full-right"><button class="btn btn-primary" onclick="submitTransaction('kbp', 'Pengembalian dari Plant')">Simpan Transaksi</button></div>
+      <div class="btn-full-right"><button class="btn btn-primary" onclick="submitTransaction(this, 'kbp', 'Pengembalian dari Plant')">Simpan Transaksi</button></div>
     </div>
   </div>
 
@@ -337,7 +345,7 @@
         <button class="btn btn-sm" onclick="addRow('ks')">+ Tambah baris</button>
         <span class="qty-display">Total tabung: <strong id="ks-qty">0</strong></span>
       </div>
-      <div class="btn-full-right"><button class="btn btn-primary" onclick="submitTransaction('ks', 'Pengembalian Kosong ke Supplier')">Simpan Transaksi</button></div>
+      <div class="btn-full-right"><button class="btn btn-primary" onclick="submitTransaction(this, 'ks', 'Pengembalian Kosong ke Supplier')">Simpan Transaksi</button></div>
     </div>
   </div>
 
@@ -361,7 +369,7 @@
         <button class="btn btn-sm" onclick="addRow('da')">+ Tambah baris</button>
         <span class="qty-display">Total tabung: <strong id="da-qty">0</strong></span>
       </div>
-      <div class="btn-full-right"><button class="btn btn-primary" onclick="submitInitialStock()">Simpan Data Awal</button></div>
+      <div class="btn-full-right"><button class="btn btn-primary" onclick="submitInitialStock(this)">Simpan Data Awal</button></div>
     </div>
   </div>
 </div>
@@ -372,7 +380,7 @@
 // ============================================================
 // KONFIGURASI — GANTI dengan URL Web App Apps Script Anda setelah deploy
 // ============================================================
-const API_URL = 'https://script.google.com/macros/s/AKfycbyrSX1U9QlRC0KNl1p8mBj2Y_rQ7gKRZIcZaeln8PjjJzkBXrdg-zsXbEMiL8AwGjGa/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbx8TPSE2QaY-5zwWMSaCmA0NRI7qU5791imO8cGMDxhDx_NdZQxuDq8dqVvoHZnvqqd/exec';
 
 // Ambang batas "usia" tabung di plant/supplier (hari) untuk pewarnaan status
 const WATCH_DAYS = 7;   // >= ini: kuning (perlu dicek)
@@ -576,17 +584,36 @@ function resetRows(prefix) {
 }
 
 // ---------- Submit transaksi ----------
-async function submitTransaction(prefix, type) {
+function setButtonLoading(btn, loading, loadingText) {
+  if (!btn) return;
+  if (loading) {
+    btn.dataset.originalText = btn.innerHTML;
+    btn.innerHTML = `<span class="spinner"></span>${loadingText || 'Menyimpan...'}`;
+    btn.disabled = true;
+  } else {
+    btn.innerHTML = btn.dataset.originalText || btn.innerHTML;
+    btn.disabled = false;
+  }
+}
+
+async function submitTransaction(btn, prefix, type) {
   const rows = collectRows(prefix);
   if (rows.length === 0) { toast('Isi minimal 1 baris tabung', true); return; }
   const user = document.getElementById('currentUser').value;
   const body = { action: 'addTransaction', type, user, rows };
   if (prefix === 'pen') { body.namaSupplier = document.getElementById('pen-supplier').value; body.noPO = document.getElementById('pen-nopo').value.trim(); }
-  if (prefix === 'kp') { body.namaPIC = document.getElementById('kp-pic').value.trim(); body.kodePlant = document.getElementById('kp-plant').value; body.noMIS = document.getElementById('kp-nomis').value.trim(); }
+  if (prefix === 'kp') { body.namaPIC = document.getElementById('kp-pic').value.trim(); body.kodePlant = document.getElementById('kp-plant').value; body.noMIS = document.getElementById('kp-nomis').value.trim(); body.detailLokasiManual = document.getElementById('kp-detaillokasi').value.trim(); }
   if (prefix === 'kbp') { body.namaPIC = document.getElementById('kbp-pic').value.trim(); body.kodePlant = document.getElementById('kbp-plant').value; body.noMIS = document.getElementById('kbp-nomis').value.trim(); }
   if (prefix === 'ks') { body.namaSupplier = document.getElementById('ks-supplier').value; body.noPengambilanSupplier = document.getElementById('ks-nopengambilan').value.trim(); }
 
-  const result = await apiPost(body);
+  setButtonLoading(btn, true);
+  let result;
+  try {
+    result = await apiPost(body);
+  } finally {
+    setButtonLoading(btn, false);
+  }
+
   if (result.error) {
     const msg = (result.errors && result.errors.length) ? result.errors.join(' | ') : result.error;
     toast('Ditolak — ' + msg, true);
@@ -595,17 +622,23 @@ async function submitTransaction(prefix, type) {
   toast(`Tersimpan — ${result.count} tabung`);
   resetRows(prefix);
   if (prefix === 'pen') document.getElementById('pen-nopo').value = '';
-  if (prefix === 'kp') { document.getElementById('kp-pic').value = ''; document.getElementById('kp-nomis').value = ''; }
+  if (prefix === 'kp') { document.getElementById('kp-pic').value = ''; document.getElementById('kp-nomis').value = ''; document.getElementById('kp-detaillokasi').value = ''; }
   if (prefix === 'kbp') { document.getElementById('kbp-pic').value = ''; document.getElementById('kbp-nomis').value = ''; }
   if (prefix === 'ks') document.getElementById('ks-nopengambilan').value = '';
   refreshFlags();
 }
 
-async function submitInitialStock() {
+async function submitInitialStock(btn) {
   const rows = collectRows('da');
   if (rows.length === 0) { toast('Isi minimal 1 baris tabung', true); return; }
   const user = document.getElementById('currentUser').value;
-  const result = await apiPost({ action: 'addInitialStock', user, rows });
+  setButtonLoading(btn, true, 'Menyimpan Data Awal...');
+  let result;
+  try {
+    result = await apiPost({ action: 'addInitialStock', user, rows });
+  } finally {
+    setButtonLoading(btn, false);
+  }
   if (result.error) { toast('Gagal: ' + result.error, true); return; }
   toast(`Data awal tersimpan — ${result.count} tabung`);
   resetRows('da');
