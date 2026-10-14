@@ -163,6 +163,68 @@
   .stat.risk{border-left-color:var(--risk);}
   .stat .label{font-size:12px;color:var(--ink-muted);font-weight:500;}
   .stat .value{font-family:var(--font-display);font-size:30px;font-weight:600;margin-top:2px;}
+  /* ---------- Monitoring di Plant: KPI clickable, filter, grup, modal ---------- */
+  .stat .hint{font-size:11px;color:var(--ink-faint);margin-top:2px;}
+  .stat.clickable{cursor:pointer;user-select:none;transition:box-shadow .15s,background .15s;}
+  .stat.clickable:hover{box-shadow:0 2px 10px rgba(20,92,115,.14);}
+  .stat.clickable:focus-visible{outline:2px solid var(--steel);outline-offset:2px;}
+  .stat.clickable.active{background:var(--steel-tint);box-shadow:0 0 0 2px var(--steel);}
+  .stat.watch.clickable.active{background:var(--watch-tint);box-shadow:0 0 0 2px var(--watch);}
+  .stat.risk.clickable.active{background:var(--risk-tint);box-shadow:0 0 0 2px var(--risk);}
+  .mon-section-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+  .mon-section-head h3{margin:0;}
+  #mon-detail-card{scroll-margin-top:12px;}
+  .muted{color:var(--ink-faint);}
+  .filter-bar{display:grid;grid-template-columns:2fr repeat(4,1fr);gap:10px;margin-bottom:12px;}
+  .filter-bar > div{min-width:0;}
+  @media (max-width:980px){.filter-bar{grid-template-columns:1fr 1fr;} .filter-bar .f-search{grid-column:1/-1;}}
+  @media (max-width:480px){.filter-bar{grid-template-columns:1fr;}}
+  .result-info{font-size:13px;color:var(--ink-muted);margin:4px 0 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;}
+  .result-info strong{color:var(--ink);}
+  .result-tools{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+  .seg button{border:none;background:#fff;padding:5px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-body);color:var(--ink-muted);}
+  .seg button.on{background:var(--steel);color:#fff;}
+  .btn-xs{padding:4px 9px;font-size:12px;border-radius:6px;}
+  .arrow-summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .arrow-summary::-webkit-details-marker{display:none;}
+  .arrow-summary::before{content:'▸';color:var(--ink-faint);display:inline-block;transition:transform .15s;}
+  details[open] > .arrow-summary::before{transform:rotate(90deg);}
+  details.card > summary h3{margin:0;}
+  details.grp{border:1px solid var(--line);border-left-width:4px;border-radius:8px;margin-bottom:8px;background:#fff;}
+  details.grp.safe{border-left-color:var(--safe);}
+  details.grp.watch{border-left-color:var(--watch);}
+  details.grp.risk{border-left-color:var(--risk);}
+  details.grp > summary{padding:10px 12px;font-weight:600;font-size:14px;}
+  details.grp.sub{margin:8px;border-left-width:3px;}
+  details.grp.sub > summary{font-size:13.5px;}
+  .grp-meta{font-weight:500;color:var(--ink-muted);font-size:13px;}
+  .grp-body{border-top:1px solid var(--line);}
+  details.grp.sub .grp-body{border-top:1px solid var(--line);}
+  .cyl-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--line);font-size:13.5px;}
+  .cyl-row:last-child{border-bottom:none;}
+  .cyl-main{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0;}
+  .cyl-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .cyl-note{flex-basis:100%;font-size:12px;color:var(--ink-muted);word-break:break-word;}
+  .tag-fu-none{background:#eceff2;color:var(--ink-muted);}
+  .tag-fu-doing{background:var(--steel-tint);color:var(--steel);}
+  .tag-fu-done{background:var(--safe-tint);color:var(--safe);}
+  textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;font-family:var(--font-body);resize:vertical;min-height:72px;color:var(--ink);}
+  textarea:focus{outline:2px solid var(--steel);outline-offset:1px;border-color:var(--steel);}
+  .modal-overlay{position:fixed;inset:0;background:rgba(15,25,35,.5);display:none;align-items:center;justify-content:center;z-index:60;padding:16px;}
+  .modal-overlay.show{display:flex;}
+  .modal{background:#fff;border-radius:12px;max-width:520px;width:100%;max-height:92vh;overflow:auto;padding:18px 20px;box-shadow:0 20px 50px rgba(0,0,0,.3);}
+  .modal-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;}
+  .modal-head h3{font-family:var(--font-display);font-weight:600;font-size:20px;margin:0;}
+  .modal-close{border:none;background:none;font-size:20px;line-height:1;cursor:pointer;color:var(--ink-muted);padding:4px 8px;}
+  .kv{display:grid;grid-template-columns:150px 1fr;gap:6px 12px;font-size:13.5px;margin:0 0 14px 0;}
+  .kv dt{color:var(--ink-muted);}
+  .kv dd{margin:0;font-weight:500;word-break:break-word;}
+  .kv-tight{margin:6px 0 0 0;}
+  @media (max-width:480px){.kv{grid-template-columns:1fr;gap:0;} .kv dt{margin-top:8px;font-size:12px;}}
+  .fu-section{border-top:1px solid var(--line);padding-top:14px;}
+  .fu-section h4{font-family:var(--font-display);font-weight:600;font-size:17px;margin:0 0 10px 0;}
+
 
   /* ---------- Tables ---------- */
   table{width:100%;border-collapse:collapse;font-size:13.5px;}
@@ -374,13 +436,20 @@
   </div>
 </div>
 
+<div id="cylModal" class="modal-overlay" onclick="if(event.target===this)closeCylinderModal()">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cylModalTitle">
+    <div class="modal-head"><h3 id="cylModalTitle">Detail Tabung</h3><button class="modal-close" onclick="closeCylinderModal()" aria-label="Tutup">✕</button></div>
+    <div id="cylModalBody"></div>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script>
 // ============================================================
 // KONFIGURASI — GANTI dengan URL Web App Apps Script Anda setelah deploy
 // ============================================================
-const API_URL = 'https://script.google.com/macros/s/AKfycbx8TPSE2QaY-5zwWMSaCmA0NRI7qU5791imO8cGMDxhDx_NdZQxuDq8dqVvoHZnvqqd/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzAvV66eAg8zw7YPIBimge9w5NW2CODwWkoqfmr9Emac8ysIERp9TpbElCkldWqywkN/exec';
 
 // Ambang batas "usia" tabung di plant/supplier (hari) untuk pewarnaan status
 const WATCH_DAYS = 7;   // >= ini: kuning (perlu dicek)
@@ -687,52 +756,475 @@ async function loadDashboard() {
 }
 
 // ---------- Monitoring di Plant (isu kehilangan tabung) ----------
+const MON = {
+  data: [],                 // semua tabung yang sedang di plant (dari server)
+  loaded: false,
+  filters: { search: '', status: '', plant: '', gas: '', fu: '' },
+  view: 'plant',            // 'plant' = Plant › Usia, 'usia' = Usia saja
+  toggled: {},              // state buka/tutup grup yang diubah user: key -> true/false
+  showAllTop: false,
+  keys: { top: [], all: [] } // key grup pada render terakhir (untuk Buka/Tutup semua)
+};
+const TOP_PLANT_LIMIT = 5;
+const FU_STATUSES = ['Belum Follow Up', 'Sudah Follow Up', 'Selesai'];
+const STATUS_ICON = { risk: '🔴', watch: '🟠', safe: '🟢' };
+let modalNomor = null;
+
+function escHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function tagForAging(cls) { return cls === 'risk' ? 'tag-risk' : cls === 'watch' ? 'tag-kosong' : 'tag-isi'; }
+function tagForFu(s) { return s === 'Selesai' ? 'tag-fu-done' : s === 'Sudah Follow Up' ? 'tag-fu-doing' : 'tag-fu-none'; }
+function monIsOpen(key, def) { return Object.prototype.hasOwnProperty.call(MON.toggled, key) ? MON.toggled[key] : def; }
+function fmtDate(v) { const d = new Date(v); return isNaN(d.getTime()) ? '-' : d.toLocaleDateString('id-ID'); }
+function fmtDateTime(v) { const d = new Date(v); return isNaN(d.getTime()) ? '-' : d.toLocaleString('id-ID'); }
+function byNomor(a, b) { return a.nomorTabung.localeCompare(b.nomorTabung, 'id', { numeric: true }); }
+
 async function loadPlantMonitoring() {
   const el = document.getElementById('monitorPlantContent');
-  el.innerHTML = 'Memuat...';
+  if (!MON.loaded) el.innerHTML = 'Memuat...';
   const d = await apiGet('getPlantMonitoring');
   if (d.error) { el.innerHTML = 'Gagal memuat: ' + d.error; return; }
+  // Nomor tabung & kode plant selalu diperlakukan sebagai TEXT (jaga angka 0 di depan)
+  MON.data = d.detail.map(x => Object.assign({}, x, {
+    nomorTabung: String(x.nomorTabung).trim(),
+    kodePlant: String(x.kodePlant).trim(),
+    followUpStatus: x.followUpStatus || 'Belum Follow Up'
+  }));
+  MON.loaded = true;
+  renderMonitoring();
+  const risk = MON.data.filter(x => agingClass(x.sudahHari) === 'risk').length;
+  document.getElementById('flag-monitorplant').classList.toggle('show', risk > 0);
+}
 
-  const riskCount = d.detail.filter(x => x.sudahHari >= RISK_DAYS).length;
-  const watchCount = d.detail.filter(x => x.sudahHari >= WATCH_DAYS && x.sudahHari < RISK_DAYS).length;
+function monCounts() {
+  let watch = 0, risk = 0;
+  MON.data.forEach(x => { const c = agingClass(x.sudahHari); if (c === 'risk') risk++; else if (c === 'watch') watch++; });
+  return { total: MON.data.length, watch, risk };
+}
 
-  let html = `<div class="stat-grid">
-    <div class="stat"><div class="label">Total di Semua Plant</div><div class="value">${d.detail.length}</div></div>
-    <div class="stat watch"><div class="label">Perlu Dicek (≥ ${WATCH_DAYS} hari)</div><div class="value">${watchCount}</div></div>
-    <div class="stat risk"><div class="label">Berisiko Hilang (≥ ${RISK_DAYS} hari)</div><div class="value">${riskCount}</div></div>
-  </div>`;
+function plantStats() {
+  const map = {};
+  MON.data.forEach(x => {
+    const m = map[x.kodePlant] || (map[x.kodePlant] = { kode: x.kodePlant, nama: x.namaPlant, total: 0, isi: 0, kosong: 0, c7: 0, c14: 0, maxHari: 0 });
+    m.total++;
+    if (x.kondisi === 'Isi') m.isi++; else m.kosong++;
+    const c = agingClass(x.sudahHari);
+    if (c === 'risk') m.c14++; else if (c === 'watch') m.c7++;
+    if (x.sudahHari > m.maxHari) m.maxHari = x.sudahHari;
+  });
+  return Object.values(map);
+}
 
-  if (d.summary.length === 0) {
-    html += `<div class="card"><div class="empty-msg">Belum ada tabung tercatat di plant manapun.</div></div>`;
+function renderMonitoring() {
+  const el = document.getElementById('monitorPlantContent');
+  if (MON.data.length === 0) {
+    el.innerHTML = `<div class="card"><div class="empty-msg">Belum ada tabung tercatat di plant manapun.</div></div>`;
+    return;
+  }
+  el.innerHTML = `
+    <div id="mon-kpi"></div>
+    <div id="mon-top"></div>
+    <div id="mon-summary"></div>
+    <div class="card" id="mon-detail-card">
+      <div class="mon-section-head"><h3>Detail Tiap Tabung</h3></div>
+      <div id="mon-filters"></div>
+      <div id="mon-results"></div>
+    </div>`;
+  renderKpi();
+  renderTopPlants();
+  renderSummaryTable();
+  renderFilters();
+  renderResults();
+}
+
+// ---- 1. KPI yang bisa diklik ----
+function renderKpi() {
+  const c = monCounts();
+  const st = MON.filters.status;
+  const card = (key, cls, label, value, hint) => `
+    <div class="stat ${cls} clickable${st === key ? ' active' : ''}" role="button" tabindex="0" data-act="kpi" data-key="${key}" aria-pressed="${st === key}">
+      <div class="label">${label}</div><div class="value">${value}</div><div class="hint">${hint}</div>
+    </div>`;
+  document.getElementById('mon-kpi').innerHTML = `<div class="stat-grid">` +
+    card('', '', 'Total di Semua Plant', c.total, 'Klik: tampilkan semua') +
+    card('watch', 'watch', `Perlu Dicek (≥ ${WATCH_DAYS} hari)`, c.watch, `Klik: hanya ${WATCH_DAYS}–${RISK_DAYS - 1} hari`) +
+    card('risk', 'risk', `Berisiko Hilang (≥ ${RISK_DAYS} hari)`, c.risk, `Klik: hanya ≥ ${RISK_DAYS} hari`) +
+    `</div>`;
+}
+
+function monSetFilters(patch) {
+  Object.assign(MON.filters, { search: '', status: '', plant: '', gas: '', fu: '' }, patch || {});
+  syncFilterInputs();
+  renderKpi();
+  renderResults();
+}
+function monSetKpi(key) { monSetFilters({ status: key }); scrollToMonDetail(); }
+function monFocusPlant(kode) { monSetFilters({ plant: kode }); scrollToMonDetail(); }
+function scrollToMonDetail() {
+  const el = document.getElementById('mon-detail-card');
+  if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ---- 2. Top Plant yang Perlu Perhatian ----
+function renderTopPlants() {
+  const list = plantStats()
+    .filter(p => p.c7 + p.c14 > 0)
+    .sort((a, b) => (b.c14 - a.c14) || (b.c7 - a.c7) || (b.maxHari - a.maxHari));
+  const shown = MON.showAllTop ? list : list.slice(0, TOP_PLANT_LIMIT);
+  let html = `<div class="card"><div class="mon-section-head"><h3>Top Plant yang Perlu Perhatian</h3>`;
+  if (list.length > TOP_PLANT_LIMIT) {
+    html += `<button class="btn btn-sm" data-act="top-toggle">${MON.showAllTop ? `Tampilkan ${TOP_PLANT_LIMIT} teratas` : `Lihat semua (${list.length})`}</button>`;
+  }
+  html += `</div>`;
+  if (list.length === 0) {
+    html += `<div class="empty-msg">Tidak ada plant yang memiliki tabung ≥ ${WATCH_DAYS} hari. 👍</div>`;
   } else {
-    html += `<div class="card"><h3>Ringkasan per Lokasi Plant</h3><div class="table-scroll"><table><tr><th>Plant</th><th>Isi</th><th>Kosong</th><th>Total</th><th>Usia Tertua</th><th>Status</th></tr>`;
-    d.summary.forEach(s => {
-      const cls = agingClass(s.maxHari);
+    html += `<div class="table-scroll"><table><tr><th>Plant</th><th>Total Tabung</th><th>${WATCH_DAYS}–${RISK_DAYS - 1} Hari</th><th>≥ ${RISK_DAYS} Hari</th><th>Usia Tertua</th><th>Status</th><th>Action</th></tr>`;
+    shown.forEach(p => {
+      const cls = agingClass(p.maxHari);
       html += `<tr class="row-flag ${cls}">
-        <td><strong>${s.kodePlant}</strong> — ${s.namaPlant}</td>
-        <td>${s.isi}</td><td>${s.kosong}</td><td>${s.total}</td>
-        <td>${s.maxHari} hari</td>
-        <td><span class="tag ${cls === 'risk' ? 'tag-risk' : cls === 'watch' ? 'tag-kosong' : 'tag-isi'}">${agingLabel(s.maxHari)}</span></td>
+        <td><strong>${escHtml(p.kode)}</strong> — ${escHtml(p.nama)}</td>
+        <td>${p.total}</td><td>${p.c7}</td><td>${p.c14}</td><td>${p.maxHari} hari</td>
+        <td><span class="tag ${tagForAging(cls)}">${STATUS_ICON[cls]} ${agingLabel(p.maxHari)}</span></td>
+        <td><button class="btn btn-sm" data-act="plant" data-kode="${escHtml(p.kode)}">Detail</button></td>
       </tr>`;
     });
-    html += `</table></div></div>`;
+    html += `</table></div>`;
+  }
+  html += `</div>`;
+  document.getElementById('mon-top').innerHTML = html;
+}
 
-    html += `<div class="card"><h3>Detail Tiap Tabung (diurutkan dari paling lama)</h3><div class="table-scroll"><table><tr><th>Nomor Tabung</th><th>Jenis Gas</th><th>Kondisi</th><th>Lokasi Plant</th><th>Sejak</th><th>Usia</th></tr>`;
-    d.detail.forEach(x => {
-      const cls = agingClass(x.sudahHari);
-      html += `<tr class="row-flag ${cls}">
-        <td class="mono">${x.nomorTabung}</td><td>${x.jenisGas}</td>
-        <td><span class="tag ${x.kondisi === 'Isi' ? 'tag-isi' : 'tag-kosong'}">${x.kondisi}</span></td>
-        <td>${x.kodePlant} — ${x.namaPlant}</td>
-        <td>${new Date(x.sejakTanggal).toLocaleDateString('id-ID')}</td>
-        <td><span class="tag ${cls === 'risk' ? 'tag-risk' : cls === 'watch' ? 'tag-kosong' : 'tag-isi'}">${x.sudahHari} hari</span></td>
-      </tr>`;
+// ---- Ringkasan semua plant (tabel lama, sekarang bisa dilipat) ----
+function renderSummaryTable() {
+  const list = plantStats().sort((a, b) => b.maxHari - a.maxHari);
+  let html = `<details class="card" id="mon-summary-card" data-key="__summary__" ${monIsOpen('__summary__', false) ? 'open' : ''}>
+    <summary class="arrow-summary"><h3>Ringkasan per Lokasi Plant</h3><span class="grp-meta">semua plant, termasuk Isi/Kosong</span></summary>
+    <div class="table-scroll" style="margin-top:12px"><table><tr><th>Plant</th><th>Isi</th><th>Kosong</th><th>Total</th><th>Usia Tertua</th><th>Status</th><th>Action</th></tr>`;
+  list.forEach(s => {
+    const cls = agingClass(s.maxHari);
+    html += `<tr class="row-flag ${cls}">
+      <td><strong>${escHtml(s.kode)}</strong> — ${escHtml(s.nama)}</td>
+      <td>${s.isi}</td><td>${s.kosong}</td><td>${s.total}</td><td>${s.maxHari} hari</td>
+      <td><span class="tag ${tagForAging(cls)}">${agingLabel(s.maxHari)}</span></td>
+      <td><button class="btn btn-sm" data-act="plant" data-kode="${escHtml(s.kode)}">Detail</button></td>
+    </tr>`;
+  });
+  html += `</table></div></details>`;
+  document.getElementById('mon-summary').innerHTML = html;
+}
+
+// ---- 4. Filter & search ----
+function renderFilters() {
+  const plants = plantStats().sort((a, b) => (a.kode + a.nama).localeCompare(b.kode + b.nama, 'id', { numeric: true }));
+  const order = (typeof MASTER !== 'undefined' && MASTER.gasTypes) ? MASTER.gasTypes : [];
+  const gases = Array.from(new Set(MON.data.map(x => x.jenisGas))).sort((a, b) => {
+    const ia = order.indexOf(a), ib = order.indexOf(b);
+    return ((ia < 0 ? 999 : ia) - (ib < 0 ? 999 : ib)) || a.localeCompare(b);
+  });
+  if (MON.filters.plant && !plants.some(p => p.kode === MON.filters.plant)) MON.filters.plant = '';
+  if (MON.filters.gas && gases.indexOf(MON.filters.gas) < 0) MON.filters.gas = '';
+
+  document.getElementById('mon-filters').innerHTML = `
+    <div class="filter-bar">
+      <div class="f-search"><label for="mon-f-search">🔍 Cari Nomor Tabung</label>
+        <input id="mon-f-search" type="search" placeholder="Ketik nomor tabung..." autocomplete="off" value="${escHtml(MON.filters.search)}"></div>
+      <div><label for="mon-f-status">Status</label>
+        <select id="mon-f-status">
+          <option value="">Semua status</option>
+          <option value="risk">Berisiko (≥ ${RISK_DAYS} hari)</option>
+          <option value="watch">Perlu dicek (${WATCH_DAYS}–${RISK_DAYS - 1} hari)</option>
+          <option value="safe">Aman (&lt; ${WATCH_DAYS} hari)</option>
+        </select></div>
+      <div><label for="mon-f-plant">Plant</label>
+        <select id="mon-f-plant"><option value="">Semua plant</option>${plants.map(p => `<option value="${escHtml(p.kode)}">${escHtml(p.kode)} — ${escHtml(p.nama)}</option>`).join('')}</select></div>
+      <div><label for="mon-f-gas">Jenis Gas</label>
+        <select id="mon-f-gas"><option value="">Semua jenis</option>${gases.map(g => `<option value="${escHtml(g)}">${escHtml(g)}</option>`).join('')}</select></div>
+      <div><label for="mon-f-fu">Follow Up</label>
+        <select id="mon-f-fu"><option value="">Semua</option>${FU_STATUSES.map(s => `<option value="${s}">${s}</option>`).join('')}</select></div>
+    </div>`;
+  syncFilterInputs();
+
+  // Search bekerja langsung saat mengetik; baca MON.filters (bukan salinan) supaya selalu terbaru
+  document.getElementById('mon-f-search').addEventListener('input', e => { MON.filters.search = e.target.value; renderResults(); });
+  ['status', 'plant', 'gas', 'fu'].forEach(k => {
+    document.getElementById('mon-f-' + k).addEventListener('change', e => {
+      MON.filters[k] = e.target.value;
+      if (k === 'status') renderKpi();
+      renderResults();
     });
-    html += `</table></div></div>`;
+  });
+}
+
+function syncFilterInputs() {
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+  set('mon-f-search', MON.filters.search);
+  set('mon-f-status', MON.filters.status);
+  set('mon-f-plant', MON.filters.plant);
+  set('mon-f-gas', MON.filters.gas);
+  set('mon-f-fu', MON.filters.fu);
+}
+
+function monFiltered() {
+  const f = MON.filters;
+  const q = f.search.trim().toLowerCase();
+  return MON.data.filter(x =>
+    (!q || x.nomorTabung.toLowerCase().includes(q)) &&
+    (!f.status || agingClass(x.sudahHari) === f.status) &&
+    (!f.plant || x.kodePlant === f.plant) &&
+    (!f.gas || x.jenisGas === f.gas) &&
+    (!f.fu || x.followUpStatus === f.fu)
+  );
+}
+
+function monDescribe(n) {
+  const f = MON.filters;
+  let what = 'tabung';
+  if (f.status === 'risk') what = `tabung berisiko (≥${RISK_DAYS} hari)`;
+  else if (f.status === 'watch') what = `tabung perlu dicek (${WATCH_DAYS}–${RISK_DAYS - 1} hari)`;
+  else if (f.status === 'safe') what = `tabung aman (<${WATCH_DAYS} hari)`;
+  let s = `Menampilkan <strong>${n}</strong> ${what}`;
+  if (f.plant) {
+    const p = MON.data.find(x => x.kodePlant === f.plant);
+    s += ` di <strong>${escHtml(f.plant)}${p ? ' — ' + escHtml(p.namaPlant) : ''}</strong>`;
+  }
+  if (f.gas) s += ` • ${escHtml(f.gas)}`;
+  if (f.fu) s += ` • ${escHtml(f.fu)}`;
+  if (f.search.trim()) s += ` • nomor mengandung “${escHtml(f.search.trim())}”`;
+  if (n !== MON.data.length && (f.plant || f.gas || f.fu || f.search.trim())) s += ` <span class="muted">(dari total ${MON.data.length})</span>`;
+  return s;
+}
+
+// ---- 5. Grouping + expand/collapse ----
+function cylRow(x) {
+  const cls = agingClass(x.sudahHari);
+  const needs = cls !== 'safe';
+  const n = escHtml(x.nomorTabung);
+  return `<div class="cyl-row">
+    <div class="cyl-main">
+      <span class="mono">${n}</span><span>${escHtml(x.jenisGas)}</span>
+      <span class="tag ${x.kondisi === 'Isi' ? 'tag-isi' : 'tag-kosong'}">${escHtml(x.kondisi)}</span>
+    </div>
+    <div class="cyl-actions">
+      ${needs ? `<span class="tag ${tagForFu(x.followUpStatus)}">${escHtml(x.followUpStatus)}</span>` : ''}
+      <button class="btn btn-xs" data-act="detail" data-nomor="${n}">Detail</button>
+      ${needs ? `<button class="btn btn-xs btn-primary" data-act="followup" data-nomor="${n}">Follow Up</button>` : ''}
+    </div>
+    ${needs && x.followUpCatatan ? `<div class="cyl-note">📝 ${escHtml(x.followUpCatatan)}${x.followUpOleh ? ' — ' + escHtml(x.followUpOleh) : ''}</div>` : ''}
+  </div>`;
+}
+
+function autoOpenGroups(items) {
+  return !!(MON.filters.search.trim() || MON.filters.plant || items.length <= 30);
+}
+
+function groupsByPlant(items) {
+  const autoOpen = autoOpenGroups(items);
+  const map = {};
+  items.forEach(x => { (map[x.kodePlant] = map[x.kodePlant] || []).push(x); });
+  const groups = Object.keys(map).map(k => {
+    const arr = map[k];
+    return { kode: k, nama: arr[0].namaPlant, items: arr, maxHari: Math.max.apply(null, arr.map(i => i.sudahHari)) };
+  }).sort((a, b) => (b.maxHari - a.maxHari) || (b.items.length - a.items.length));
+
+  return groups.map(g => {
+    const cls = agingClass(g.maxHari);
+    const key = 'p:' + g.kode;
+    MON.keys.top.push(key); MON.keys.all.push(key);
+    const byAge = {};
+    g.items.forEach(x => { (byAge[x.sudahHari] = byAge[x.sudahHari] || []).push(x); });
+    const subs = Object.keys(byAge).map(Number).sort((a, b) => b - a).map(hari => {
+      const arr = byAge[hari].sort(byNomor);
+      const sc = agingClass(hari);
+      const sk = key + '|a:' + hari;
+      MON.keys.all.push(sk);
+      return `<details class="grp sub ${sc}" data-key="${escHtml(sk)}" ${monIsOpen(sk, true) ? 'open' : ''}>
+        <summary class="arrow-summary">${STATUS_ICON[sc]} ${hari} hari <span class="grp-meta">— ${arr.length} tabung · dikirim ${fmtDate(arr[0].sejakTanggal)}</span></summary>
+        <div class="grp-body">${arr.map(cylRow).join('')}</div></details>`;
+    }).join('');
+    return `<details class="grp ${cls}" data-key="${escHtml(key)}" ${monIsOpen(key, autoOpen) ? 'open' : ''}>
+      <summary class="arrow-summary">${STATUS_ICON[cls]} ${escHtml(g.kode)} — ${escHtml(g.nama)} <span class="grp-meta">— usia tertua ${g.maxHari} hari — ${g.items.length} tabung</span></summary>
+      <div class="grp-body">${subs}</div></details>`;
+  }).join('');
+}
+
+function groupsByAge(items) {
+  const autoOpen = autoOpenGroups(items);
+  const map = {};
+  items.forEach(x => { const k = x.sudahHari + '|' + x.kodePlant; (map[k] = map[k] || []).push(x); });
+  const groups = Object.keys(map).map(k => {
+    const arr = map[k];
+    return { hari: arr[0].sudahHari, kode: arr[0].kodePlant, nama: arr[0].namaPlant, items: arr };
+  }).sort((a, b) => (b.hari - a.hari) || (b.items.length - a.items.length) || a.kode.localeCompare(b.kode));
+
+  return groups.map(g => {
+    const cls = agingClass(g.hari);
+    const key = 'a:' + g.hari + '|p:' + g.kode;
+    MON.keys.top.push(key); MON.keys.all.push(key);
+    const arr = g.items.sort(byNomor);
+    return `<details class="grp ${cls}" data-key="${escHtml(key)}" ${monIsOpen(key, autoOpen) ? 'open' : ''}>
+      <summary class="arrow-summary">${STATUS_ICON[cls]} ${escHtml(g.kode)} — ${escHtml(g.nama)} <span class="grp-meta">— ${g.hari} hari — ${arr.length} tabung · dikirim ${fmtDate(arr[0].sejakTanggal)}</span></summary>
+      <div class="grp-body">${arr.map(cylRow).join('')}</div></details>`;
+  }).join('');
+}
+
+function renderResults() {
+  const el = document.getElementById('mon-results');
+  if (!el) return;
+  const items = monFiltered();
+  const f = MON.filters;
+  const anyFilter = !!(f.search.trim() || f.status || f.plant || f.gas || f.fu);
+  MON.keys = { top: [], all: [] };
+  let html = `<div class="result-info"><div>${monDescribe(items.length)}</div><div class="result-tools">
+    <div class="seg">
+      <button class="${MON.view === 'plant' ? 'on' : ''}" data-act="view" data-view="plant">Per Plant</button>
+      <button class="${MON.view === 'usia' ? 'on' : ''}" data-act="view" data-view="usia">Per Usia</button>
+    </div>
+    <button class="btn btn-xs" data-act="expand-all">Buka semua</button>
+    <button class="btn btn-xs" data-act="collapse-all">Tutup semua</button>
+    ${anyFilter ? `<button class="btn btn-xs" data-act="reset">Reset filter</button>` : ''}
+  </div></div>`;
+  if (items.length === 0) {
+    html += `<div class="empty-msg">Tidak ada tabung yang cocok dengan filter.</div>`;
+  } else {
+    html += MON.view === 'plant' ? groupsByPlant(items) : groupsByAge(items);
   }
   el.innerHTML = html;
-  document.getElementById('flag-monitorplant').classList.toggle('show', riskCount > 0);
 }
+
+// ---- 3. Detail & Follow Up ----
+function openCylinderModal(nomor, focusFollow) {
+  const x = MON.data.find(i => i.nomorTabung === nomor);
+  if (!x) return;
+  modalNomor = nomor;
+  const cls = agingClass(x.sudahHari);
+  const needs = cls !== 'safe';
+  let html = `<dl class="kv">
+    <dt>Nomor tabung</dt><dd class="mono">${escHtml(x.nomorTabung)}</dd>
+    <dt>Jenis gas</dt><dd>${escHtml(x.jenisGas)}</dd>
+    <dt>Kondisi</dt><dd><span class="tag ${x.kondisi === 'Isi' ? 'tag-isi' : 'tag-kosong'}">${escHtml(x.kondisi)}</span></dd>
+    <dt>Lokasi plant</dt><dd>${escHtml(x.kodePlant)} — ${escHtml(x.namaPlant)}</dd>
+    <dt>Terakhir dikirim ke plant</dt><dd>${fmtDateTime(x.sejakTanggal)}</dd>
+    <dt>Lama di plant</dt><dd>${x.sudahHari} hari</dd>
+    <dt>Status</dt><dd><span class="tag ${tagForAging(cls)}">${STATUS_ICON[cls]} ${agingLabel(x.sudahHari)}</span></dd>
+  </dl>
+  <div id="cylShipInfo" class="info-box">Memuat info pengiriman...</div>`;
+  if (needs) {
+    html += `<div id="fu-section" class="fu-section">
+      <h4>Follow Up</h4>
+      <label for="fu-status">Status Follow Up</label>
+      <select id="fu-status">${FU_STATUSES.map(s => `<option value="${s}" ${s === x.followUpStatus ? 'selected' : ''}>${s}</option>`).join('')}</select>
+      <label for="fu-catatan" style="margin-top:12px">Catatan</label>
+      <textarea id="fu-catatan" maxlength="500" placeholder="Contoh: sudah ditanyakan ke PIC, tabung masih dipakai di area produksi">${escHtml(x.followUpCatatan)}</textarea>
+      ${x.followUpOleh ? `<div class="helper-text" style="margin:6px 0 0">Terakhir diupdate oleh ${escHtml(x.followUpOleh)}${x.followUpTanggal ? ' • ' + fmtDateTime(x.followUpTanggal) : ''}</div>` : ''}
+      <div class="btn-full-right">
+        <button class="btn" onclick="closeCylinderModal()">Batal</button>
+        <button class="btn btn-primary" onclick="saveFollowUp(this)">Simpan Follow Up</button>
+      </div>
+    </div>`;
+  } else {
+    html += `<div class="helper-text">Belum perlu Follow Up (berada di plant kurang dari ${WATCH_DAYS} hari).</div>`;
+  }
+  document.getElementById('cylModalBody').innerHTML = html;
+  document.getElementById('cylModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  loadShipInfo(nomor);
+  if (focusFollow && needs) {
+    setTimeout(() => {
+      const sec = document.getElementById('fu-section');
+      if (sec && sec.scrollIntoView) sec.scrollIntoView({ block: 'nearest' });
+      const sel = document.getElementById('fu-status');
+      if (sel) sel.focus();
+    }, 50);
+  }
+}
+
+async function loadShipInfo(nomor) {
+  let html;
+  try {
+    // pakai riwayat yang sudah ada — ambil pengiriman terakhir ke plant (PIC, No MIS, detail lokasi)
+    const list = await apiGet('getHistory', { nomorTabung: nomor });
+    if (!Array.isArray(list)) throw new Error('bad response');
+    const e = list.find(t => t.JenisTransaksi === 'Pengiriman ke Plant') || list.find(t => t.JenisTransaksi === 'Data Awal');
+    const rows = e ? [['Diterima oleh (PIC)', e.NamaPIC], ['No MIS', e.NoMIS], ['Detail lokasi', e.DetailLokasiManual], ['Diinput oleh', e.DiinputOleh]].filter(r => r[1]) : [];
+    html = rows.length
+      ? `<strong>Info pengiriman terakhir</strong><dl class="kv kv-tight">${rows.map(r => `<dt>${r[0]}</dt><dd>${escHtml(r[1])}</dd>`).join('')}</dl>`
+      : 'Tidak ada info PIC / No MIS pada pengiriman terakhir (mungkin berasal dari Data Awal).';
+  } catch (err) {
+    html = 'Info pengiriman tidak bisa dimuat.';
+  }
+  const box = document.getElementById('cylShipInfo');
+  if (box && modalNomor === nomor) box.innerHTML = html;
+}
+
+function closeCylinderModal() {
+  modalNomor = null;
+  const m = document.getElementById('cylModal');
+  if (m) m.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+async function saveFollowUp(btn) {
+  const nomor = modalNomor;
+  if (!nomor) return;
+  const status = document.getElementById('fu-status').value;
+  const catatan = document.getElementById('fu-catatan').value.trim();
+  const user = document.getElementById('currentUser').value;
+  setButtonLoading(btn, true);
+  let result;
+  try {
+    result = await apiPost({ action: 'setFollowUp', nomorTabung: nomor, status: status, catatan: catatan, user: user });
+  } catch (err) {
+    toast('Gagal menyimpan Follow Up: ' + err.message, true);
+    return;
+  } finally {
+    setButtonLoading(btn, false);
+  }
+  if (result.error) { toast('Gagal: ' + result.error, true); return; }
+  const x = MON.data.find(i => i.nomorTabung === nomor);
+  if (x) {
+    x.followUpStatus = status; x.followUpCatatan = catatan;
+    x.followUpOleh = user; x.followUpTanggal = new Date().toISOString();
+  }
+  toast('Follow Up tersimpan');
+  closeCylinderModal();
+  renderResults();
+}
+
+// ---- Event handler (delegasi) untuk seluruh halaman monitoring ----
+(function bindMonitoringEvents() {
+  const root = document.getElementById('monitorPlantContent');
+  root.addEventListener('click', e => {
+    // catat buka/tutup grup yang di-klik user (event click terjadi SEBELUM <details> berubah)
+    const sum = e.target.closest('summary');
+    if (sum && sum.parentElement.dataset.key) {
+      const d = sum.parentElement;
+      MON.toggled[d.dataset.key] = !d.open;
+      return;
+    }
+    const t = e.target.closest('[data-act]');
+    if (!t) return;
+    switch (t.dataset.act) {
+      case 'kpi': monSetKpi(t.dataset.key); break;
+      case 'plant': monFocusPlant(t.dataset.kode); break;
+      case 'detail': openCylinderModal(t.dataset.nomor, false); break;
+      case 'followup': openCylinderModal(t.dataset.nomor, true); break;
+      case 'top-toggle': MON.showAllTop = !MON.showAllTop; renderTopPlants(); break;
+      case 'view': MON.view = t.dataset.view; renderResults(); break;
+      case 'expand-all': MON.keys.all.forEach(k => { MON.toggled[k] = true; }); renderResults(); break;
+      case 'collapse-all': MON.keys.top.forEach(k => { MON.toggled[k] = false; }); renderResults(); break;
+      case 'reset': monSetFilters({}); break;
+    }
+  });
+  root.addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('[data-act="kpi"]')) {
+      e.preventDefault();
+      monSetKpi(e.target.dataset.key);
+    }
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCylinderModal(); });
+})();
 
 // ---------- Posisi di Supplier ----------
 async function loadAtSupplier() {
