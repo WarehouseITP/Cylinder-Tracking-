@@ -449,11 +449,16 @@
 // ============================================================
 // KONFIGURASI — GANTI dengan URL Web App Apps Script Anda setelah deploy
 // ============================================================
-const API_URL = 'https://script.google.com/macros/s/AKfycbzAvV66eAg8zw7YPIBimge9w5NW2CODwWkoqfmr9Emac8ysIERp9TpbElCkldWqywkN/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxIYiLf0UepVaL6EUlt2P8Ir_h85pvqNrI8g5mjLPYrDuDvJtpq8_l5UEZYm84Lbbt7/exec';
 
 // Ambang batas "usia" tabung di plant/supplier (hari) untuk pewarnaan status
 const WATCH_DAYS = 7;   // >= ini: kuning (perlu dicek)
 const RISK_DAYS = 14;   // >= ini: merah (berisiko hilang, perlu ditindaklanjuti)
+
+// Ambang usia tabung DI PLANT (hari) — khusus halaman Monitoring di Plant & titik merah di menu.
+// Ubah angka di sini kalau ambangnya perlu disesuaikan lagi.
+const PLANT_WATCH_DAYS = 25;  // >= ini: oranye (perlu dicek)
+const PLANT_RISK_DAYS = 45;   // >= ini: merah (berisiko hilang)
 
 const NAV_GROUPS = [
   { label: 'Ringkasan', items: [
@@ -725,6 +730,16 @@ function agingLabel(hari) {
   if (hari >= WATCH_DAYS) return 'Perlu dicek';
   return 'Aman';
 }
+function plantAgingClass(hari) {
+  if (hari >= PLANT_RISK_DAYS) return 'risk';
+  if (hari >= PLANT_WATCH_DAYS) return 'watch';
+  return 'safe';
+}
+function plantAgingLabel(hari) {
+  if (hari >= PLANT_RISK_DAYS) return 'Berisiko';
+  if (hari >= PLANT_WATCH_DAYS) return 'Perlu dicek';
+  return 'Aman';
+}
 
 // ---------- Dashboard ----------
 async function loadDashboard() {
@@ -793,13 +808,13 @@ async function loadPlantMonitoring() {
   }));
   MON.loaded = true;
   renderMonitoring();
-  const risk = MON.data.filter(x => agingClass(x.sudahHari) === 'risk').length;
+  const risk = MON.data.filter(x => plantAgingClass(x.sudahHari) === 'risk').length;
   document.getElementById('flag-monitorplant').classList.toggle('show', risk > 0);
 }
 
 function monCounts() {
   let watch = 0, risk = 0;
-  MON.data.forEach(x => { const c = agingClass(x.sudahHari); if (c === 'risk') risk++; else if (c === 'watch') watch++; });
+  MON.data.forEach(x => { const c = plantAgingClass(x.sudahHari); if (c === 'risk') risk++; else if (c === 'watch') watch++; });
   return { total: MON.data.length, watch, risk };
 }
 
@@ -809,7 +824,7 @@ function plantStats() {
     const m = map[x.kodePlant] || (map[x.kodePlant] = { kode: x.kodePlant, nama: x.namaPlant, total: 0, isi: 0, kosong: 0, c7: 0, c14: 0, maxHari: 0 });
     m.total++;
     if (x.kondisi === 'Isi') m.isi++; else m.kosong++;
-    const c = agingClass(x.sudahHari);
+    const c = plantAgingClass(x.sudahHari);
     if (c === 'risk') m.c14++; else if (c === 'watch') m.c7++;
     if (x.sudahHari > m.maxHari) m.maxHari = x.sudahHari;
   });
@@ -848,8 +863,8 @@ function renderKpi() {
     </div>`;
   document.getElementById('mon-kpi').innerHTML = `<div class="stat-grid">` +
     card('', '', 'Total di Semua Plant', c.total, 'Klik: tampilkan semua') +
-    card('watch', 'watch', `Perlu Dicek (≥ ${WATCH_DAYS} hari)`, c.watch, `Klik: hanya ${WATCH_DAYS}–${RISK_DAYS - 1} hari`) +
-    card('risk', 'risk', `Berisiko Hilang (≥ ${RISK_DAYS} hari)`, c.risk, `Klik: hanya ≥ ${RISK_DAYS} hari`) +
+    card('watch', 'watch', `Perlu Dicek (≥ ${PLANT_WATCH_DAYS} hari)`, c.watch, `Klik: hanya ${PLANT_WATCH_DAYS}–${PLANT_RISK_DAYS - 1} hari`) +
+    card('risk', 'risk', `Berisiko Hilang (≥ ${PLANT_RISK_DAYS} hari)`, c.risk, `Klik: hanya ≥ ${PLANT_RISK_DAYS} hari`) +
     `</div>`;
 }
 
@@ -878,15 +893,15 @@ function renderTopPlants() {
   }
   html += `</div>`;
   if (list.length === 0) {
-    html += `<div class="empty-msg">Tidak ada plant yang memiliki tabung ≥ ${WATCH_DAYS} hari. 👍</div>`;
+    html += `<div class="empty-msg">Tidak ada plant yang memiliki tabung ≥ ${PLANT_WATCH_DAYS} hari. 👍</div>`;
   } else {
-    html += `<div class="table-scroll"><table><tr><th>Plant</th><th>Total Tabung</th><th>${WATCH_DAYS}–${RISK_DAYS - 1} Hari</th><th>≥ ${RISK_DAYS} Hari</th><th>Usia Tertua</th><th>Status</th><th>Action</th></tr>`;
+    html += `<div class="table-scroll"><table><tr><th>Plant</th><th>Total Tabung</th><th>${PLANT_WATCH_DAYS}–${PLANT_RISK_DAYS - 1} Hari</th><th>≥ ${PLANT_RISK_DAYS} Hari</th><th>Usia Tertua</th><th>Status</th><th>Action</th></tr>`;
     shown.forEach(p => {
-      const cls = agingClass(p.maxHari);
+      const cls = plantAgingClass(p.maxHari);
       html += `<tr class="row-flag ${cls}">
         <td><strong>${escHtml(p.kode)}</strong> — ${escHtml(p.nama)}</td>
         <td>${p.total}</td><td>${p.c7}</td><td>${p.c14}</td><td>${p.maxHari} hari</td>
-        <td><span class="tag ${tagForAging(cls)}">${STATUS_ICON[cls]} ${agingLabel(p.maxHari)}</span></td>
+        <td><span class="tag ${tagForAging(cls)}">${STATUS_ICON[cls]} ${plantAgingLabel(p.maxHari)}</span></td>
         <td><button class="btn btn-sm" data-act="plant" data-kode="${escHtml(p.kode)}">Detail</button></td>
       </tr>`;
     });
@@ -903,11 +918,11 @@ function renderSummaryTable() {
     <summary class="arrow-summary"><h3>Ringkasan per Lokasi Plant</h3><span class="grp-meta">semua plant, termasuk Isi/Kosong</span></summary>
     <div class="table-scroll" style="margin-top:12px"><table><tr><th>Plant</th><th>Isi</th><th>Kosong</th><th>Total</th><th>Usia Tertua</th><th>Status</th><th>Action</th></tr>`;
   list.forEach(s => {
-    const cls = agingClass(s.maxHari);
+    const cls = plantAgingClass(s.maxHari);
     html += `<tr class="row-flag ${cls}">
       <td><strong>${escHtml(s.kode)}</strong> — ${escHtml(s.nama)}</td>
       <td>${s.isi}</td><td>${s.kosong}</td><td>${s.total}</td><td>${s.maxHari} hari</td>
-      <td><span class="tag ${tagForAging(cls)}">${agingLabel(s.maxHari)}</span></td>
+      <td><span class="tag ${tagForAging(cls)}">${plantAgingLabel(s.maxHari)}</span></td>
       <td><button class="btn btn-sm" data-act="plant" data-kode="${escHtml(s.kode)}">Detail</button></td>
     </tr>`;
   });
@@ -933,9 +948,9 @@ function renderFilters() {
       <div><label for="mon-f-status">Status</label>
         <select id="mon-f-status">
           <option value="">Semua status</option>
-          <option value="risk">Berisiko (≥ ${RISK_DAYS} hari)</option>
-          <option value="watch">Perlu dicek (${WATCH_DAYS}–${RISK_DAYS - 1} hari)</option>
-          <option value="safe">Aman (&lt; ${WATCH_DAYS} hari)</option>
+          <option value="risk">Berisiko (≥ ${PLANT_RISK_DAYS} hari)</option>
+          <option value="watch">Perlu dicek (${PLANT_WATCH_DAYS}–${PLANT_RISK_DAYS - 1} hari)</option>
+          <option value="safe">Aman (&lt; ${PLANT_WATCH_DAYS} hari)</option>
         </select></div>
       <div><label for="mon-f-plant">Plant</label>
         <select id="mon-f-plant"><option value="">Semua plant</option>${plants.map(p => `<option value="${escHtml(p.kode)}">${escHtml(p.kode)} — ${escHtml(p.nama)}</option>`).join('')}</select></div>
@@ -971,7 +986,7 @@ function monFiltered() {
   const q = f.search.trim().toLowerCase();
   return MON.data.filter(x =>
     (!q || x.nomorTabung.toLowerCase().includes(q)) &&
-    (!f.status || agingClass(x.sudahHari) === f.status) &&
+    (!f.status || plantAgingClass(x.sudahHari) === f.status) &&
     (!f.plant || x.kodePlant === f.plant) &&
     (!f.gas || x.jenisGas === f.gas) &&
     (!f.fu || x.followUpStatus === f.fu)
@@ -981,9 +996,9 @@ function monFiltered() {
 function monDescribe(n) {
   const f = MON.filters;
   let what = 'tabung';
-  if (f.status === 'risk') what = `tabung berisiko (≥${RISK_DAYS} hari)`;
-  else if (f.status === 'watch') what = `tabung perlu dicek (${WATCH_DAYS}–${RISK_DAYS - 1} hari)`;
-  else if (f.status === 'safe') what = `tabung aman (<${WATCH_DAYS} hari)`;
+  if (f.status === 'risk') what = `tabung berisiko (≥${PLANT_RISK_DAYS} hari)`;
+  else if (f.status === 'watch') what = `tabung perlu dicek (${PLANT_WATCH_DAYS}–${PLANT_RISK_DAYS - 1} hari)`;
+  else if (f.status === 'safe') what = `tabung aman (<${PLANT_WATCH_DAYS} hari)`;
   let s = `Menampilkan <strong>${n}</strong> ${what}`;
   if (f.plant) {
     const p = MON.data.find(x => x.kodePlant === f.plant);
@@ -998,7 +1013,7 @@ function monDescribe(n) {
 
 // ---- 5. Grouping + expand/collapse ----
 function cylRow(x) {
-  const cls = agingClass(x.sudahHari);
+  const cls = plantAgingClass(x.sudahHari);
   const needs = cls !== 'safe';
   const n = escHtml(x.nomorTabung);
   return `<div class="cyl-row">
@@ -1029,14 +1044,14 @@ function groupsByPlant(items) {
   }).sort((a, b) => (b.maxHari - a.maxHari) || (b.items.length - a.items.length));
 
   return groups.map(g => {
-    const cls = agingClass(g.maxHari);
+    const cls = plantAgingClass(g.maxHari);
     const key = 'p:' + g.kode;
     MON.keys.top.push(key); MON.keys.all.push(key);
     const byAge = {};
     g.items.forEach(x => { (byAge[x.sudahHari] = byAge[x.sudahHari] || []).push(x); });
     const subs = Object.keys(byAge).map(Number).sort((a, b) => b - a).map(hari => {
       const arr = byAge[hari].sort(byNomor);
-      const sc = agingClass(hari);
+      const sc = plantAgingClass(hari);
       const sk = key + '|a:' + hari;
       MON.keys.all.push(sk);
       return `<details class="grp sub ${sc}" data-key="${escHtml(sk)}" ${monIsOpen(sk, true) ? 'open' : ''}>
@@ -1059,7 +1074,7 @@ function groupsByAge(items) {
   }).sort((a, b) => (b.hari - a.hari) || (b.items.length - a.items.length) || a.kode.localeCompare(b.kode));
 
   return groups.map(g => {
-    const cls = agingClass(g.hari);
+    const cls = plantAgingClass(g.hari);
     const key = 'a:' + g.hari + '|p:' + g.kode;
     MON.keys.top.push(key); MON.keys.all.push(key);
     const arr = g.items.sort(byNomor);
@@ -1098,7 +1113,7 @@ function openCylinderModal(nomor, focusFollow) {
   const x = MON.data.find(i => i.nomorTabung === nomor);
   if (!x) return;
   modalNomor = nomor;
-  const cls = agingClass(x.sudahHari);
+  const cls = plantAgingClass(x.sudahHari);
   const needs = cls !== 'safe';
   let html = `<dl class="kv">
     <dt>Nomor tabung</dt><dd class="mono">${escHtml(x.nomorTabung)}</dd>
@@ -1107,7 +1122,7 @@ function openCylinderModal(nomor, focusFollow) {
     <dt>Lokasi plant</dt><dd>${escHtml(x.kodePlant)} — ${escHtml(x.namaPlant)}</dd>
     <dt>Terakhir dikirim ke plant</dt><dd>${fmtDateTime(x.sejakTanggal)}</dd>
     <dt>Lama di plant</dt><dd>${x.sudahHari} hari</dd>
-    <dt>Status</dt><dd><span class="tag ${tagForAging(cls)}">${STATUS_ICON[cls]} ${agingLabel(x.sudahHari)}</span></dd>
+    <dt>Status</dt><dd><span class="tag ${tagForAging(cls)}">${STATUS_ICON[cls]} ${plantAgingLabel(x.sudahHari)}</span></dd>
   </dl>
   <div id="cylShipInfo" class="info-box">Memuat info pengiriman...</div>`;
   if (needs) {
@@ -1124,7 +1139,7 @@ function openCylinderModal(nomor, focusFollow) {
       </div>
     </div>`;
   } else {
-    html += `<div class="helper-text">Belum perlu Follow Up (berada di plant kurang dari ${WATCH_DAYS} hari).</div>`;
+    html += `<div class="helper-text">Belum perlu Follow Up (berada di plant kurang dari ${PLANT_WATCH_DAYS} hari).</div>`;
   }
   document.getElementById('cylModalBody').innerHTML = html;
   document.getElementById('cylModal').classList.add('show');
@@ -1277,7 +1292,7 @@ async function searchHistory() {
 async function refreshFlags() {
   const d = await apiGet('getPlantMonitoring');
   if (d.error) return;
-  const riskCount = d.detail.filter(x => x.sudahHari >= RISK_DAYS).length;
+  const riskCount = d.detail.filter(x => x.sudahHari >= PLANT_RISK_DAYS).length;
   document.getElementById('flag-monitorplant').classList.toggle('show', riskCount > 0);
 }
 
